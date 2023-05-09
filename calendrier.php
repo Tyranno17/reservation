@@ -7,6 +7,23 @@ require_once '../includes/functions.php';
 $services = getServices();
 $vehicules = getVehicules();
 
+// Requête SQL pour sélectionner les réservations
+$sql_reservations = "SELECT * FROM reservation";
+
+// Exécutez la requête
+$result_reservations = $mysqli->query($sql_reservations);
+
+
+$reservations = [];
+
+// Vérifiez si des résultats ont été trouvés
+if ($result_reservations->num_rows > 0) {
+    // Parcourez les résultats et stockez-les dans un tableau
+    while ($row = $result_reservations->fetch_assoc()) {
+        $reservations[] = $row;
+    }
+}
+
 ?>
 
 <!doctype html>
@@ -142,238 +159,231 @@ $vehicules = getVehicules();
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                <form id="editEventForm">
-                                    <div class="form-group">
-                                        <label for="edit_reservation_id">ID de réservation</label>
-                                        <input type="text" class="form-control" id="edit_reservation_id"
-                                            name="reservation_id" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edit_service_id">Service</label>
-                                        <select class="form-control" id="edit_service_id" name="service_id" required>
-                                            <?php foreach ($services as $service): ?>
-                                                <option value="<?php echo $service['id']; ?>"><?php echo $service['nom']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edit_vehicule_id">Véhicule</label>
-                                        <select class="form-control" id="edit_vehicule_id" name="vehicule_id" required>
-                                            <?php foreach ($vehicules as $vehicule): ?>
-                                                <option value="<?php echo $vehicule['id']; ?>"
-                                                    data-service-id="<?php echo $vehicule['service_id']; ?>"><?php echo $vehicule['marque'] . ' ' . $vehicule['modele'] . ' (' . $vehicule['immatriculation'] . ')'; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edit_date_debut">Date de début</label>
-                                        <input type="text" class="form-control" id="edit_date_debut" name="date_debut"
-                                            required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edit_date_fin">Date de fin</label>
-                                        <input type="text" class="form-control" id="edit_date_fin" name="date_fin"
-                                            required>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-dismiss="modal">Annuler</button>
-                                        <button type="submit" class="btn btn-primary">Enregistrer les
-                                            modifications</button>
-                                    </div>
-                                </form>
+                            <div class="form-group">
+                                <label for="edit_reservation_id">ID de réservation</label>
+                                <select class="form-control" id="edit_reservation_id" name="reservation_id" required>
+                                    <?php foreach ($reservations as $reservation): ?>
+                                        <option value="<?php echo $reservation['id']; ?>"><?php echo $reservation['id']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for="edit_service_id">Service</label>
+                                <select class="form-control" id="edit_service_id" name="service_id" required>
+                                    <?php foreach ($services as $service): ?>
+                                        <option value="<?php echo $service['id']; ?>"><?php echo $service['nom']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_vehicule_id">Véhicule</label>
+                                <select class="form-control" id="edit_vehicule_id" name="vehicule_id" required>
+                                    <?php foreach ($vehicules as $vehicule): ?>
+                                        <option value="<?php echo $vehicule['id']; ?>"
+                                            data-service-id="<?php echo $vehicule['service_id']; ?>"><?php echo $vehicule['marque'] . ' ' . $vehicule['modele'] . ' (' . $vehicule['immatriculation'] . ')'; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_date_debut">Date de début</label>
+                                <input type="text" class="form-control" id="edit_date_debut" name="date_debut" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_date_fin">Date de fin</label>
+                                <input type="text" class="form-control" id="edit_date_fin" name="date_fin" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-primary">Enregistrer les
+                                    modifications</button>
+                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
+            </div>
 
 
-                <?php
-                require_once 'footer.php';
-                ?>
+            <?php
+            require_once 'footer.php';
+            ?>
 
-                <script>
-                    $(document).ready(function () {
-                        initCalendar();
-                        // Initialisation de flatpickr sur les champs de date
-                        flatpickr("#add_date_debut", {
-                            locale: "fr",
-                            dateFormat: "d-m-Y H:i",
-                            enableTime: true,
-                            time_24hr: true,
-                            minTime: "07:00",
-                            maxTime: "18:00",
-                            minuteIncrement: 30,
+            <script>
+                $(document).ready(function () {
+                    initCalendar();
 
+                    // Initialisation de flatpickr sur les champs de date
+                    flatpickr("#add_date_debut", {
+                        locale: "fr",
+                        dateFormat: "d-m-Y H:i",
+                        enableTime: true,
+                        time_24hr: true,
+                        minTime: "07:00",
+                        maxTime: "18:00",
+                        minuteIncrement: 30,
+                    });
+
+                    flatpickr("#add_date_fin", {
+                        locale: "fr",
+                        dateFormat: "d-m-Y H:i",
+                        enableTime: true,
+                        time_24hr: true,
+                        minTime: "07:00",
+                        maxTime: "18:00",
+                        minuteIncrement: 30,
+                    });
+
+                    // Filtre les véhicules en fonction du service sélectionné
+                    $("#add_service_id").on("change", function () {
+                        var selectedServiceId = $(this).val();
+                        // Code pour filtrer les véhicules en fonction du service sélectionné
+                        $("#add_vehicule_id option").each(function () {
+                            var vehiculeServiceId = $(this).data("service-id");
+                            if (selectedServiceId == vehiculeServiceId || $(this).val() == "") {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
                         });
+                    });
 
-                        flatpickr("#add_date_fin", {
-                            locale: "fr",
-                            dateFormat: "d-m-Y H:i",
-                            enableTime: true,
-                            time_24hr: true,
-                            minTime: "07:00",
-                            maxTime: "18:00",
-                            minuteIncrement: 30,
+                });
 
+                // Ajout des écouteurs d'événements pour les modals
+                $('#viewEventModal').on('shown.bs.modal', function () {
+                    var editButton = document.getElementById('editEventButton');
+                    if (editButton) {
+                        editButton.addEventListener('click', function () {
+                            // Récupération des données de l'événement à partir de la modal de visualisation
+                            var reservationId = $('#view_reservation_id').val();
+                            var serviceId = $('#view_service_id').val();
+                            var vehiculeId = $('#view_vehicule_id').val();
+                            var dateDebut = $('#view_date_debut').val();
+                            var dateFin = $('#view_date_fin').val();
+
+                            // Transfert des données vers la modal d'édition
+                            $('#edit_reservation_id').val(reservationId);
+                            $('#edit_service_id').val(serviceId);
+                            $('#edit_vehicule_id').val(vehiculeId);
+                            $('#edit_date_debut').val(dateDebut);
+                            $('#edit_date_fin').val(dateFin);
+
+                            // Fermeture de la modal de visualisation
+                            // $('#viewEventModal').modal('hide');
+                            $('#viewEventModal').modal('toggle');
+
+                            // Ouverture de la modal d'édition
+                            $('#editEventModal').modal('show');
                         });
+                    }
+                });
 
-                        // Filtre les véhicules en fonction du service sélectionné
-                        $("#add_service_id").on("change", function () {
-                            var selectedServiceId = $(this).val();
-                            $("#add_vehicule_id option").each(function () {
-                                var vehiculeServiceId = $(this).data("service-id");
-                                if (selectedServiceId == vehiculeServiceId || $(this).val() == "") {
-                                    $(this).show();
-                                } else {
-                                    $(this).hide();
+                $('#editEventModal').on('shown.bs.modal', function () {
+                    var saveButton = document.getElementById('saveEditEventButton');
+                    if (saveButton) {
+                        saveButton.addEventListener('click', function () {
+                            // Récupération des données mises à jour à partir de la modal d'édition
+                            var reservationId = $('#edit_reservation_id').val();
+                            var serviceId = $('#edit_service_id').val();
+                            var vehiculeId = $('#edit_vehicule_id').val();
+                            var dateDebut = $('#edit_date_debut').val();
+                            var dateFin = $('#edit_date_fin').val();
+
+                            // Mise à jour de l'événement sur le serveur
+                            $.ajax({
+                                url: 'save-event.php',
+                                method: 'POST',
+                                data: {
+                                    reservation_id: reservationId,
+                                    service_id: serviceId,
+                                    vehicule_id: vehiculeId,
+                                    date_debut: dateDebut,
+                                    date_fin: dateFin
+                                },
+                                success: function (response) {
+                                    // Fermeture de la modal d'édition
+                                    $('#editEventModal').modal('hide');
+
+                                    // Rechargement du calendrier pour afficher les modifications
+                                    calendar.refetchEvents();
+                                },
+                                error: function (xhr, status, error) {
+                                    // Gestion des erreurs éventuelles lors de la mise à jour
+                                    console.error('Erreur lors de la mise à jour de la réservation:', error);
                                 }
                             });
                         });
-
-                    });
-
-                    function initCalendar() {
-                        var calendarEl = document.getElementById('calendar');
-                        var calendar = new FullCalendar.Calendar(calendarEl, {
-                            initialView: 'dayGridMonth',
-                            locale: 'fr',
-                            headerToolbar: {
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                            },
-                            buttonText: {
-                                today: "aujourd'hui",
-                                month: 'mois',
-                                week: 'semaine',
-                                day: 'jour'
-                            },
-                            allDayText: 'journée',
-                            editable: true,
-                            selectable: true,
-                            events: {
-                                url: 'get-events.php',
-                                method: 'GET',
-                                failure: function () {
-                                    alert('Erreur lors du chargement des événements.');
-                                }
-                            },
-                            validRange: function (nowDate) {
-                                return {
-                                    start: nowDate
-                                };
-                            },
-                            eventClick: function (info) {
-                                showEventModal("view", info.event);
-                            },
-                            select: function (info) {
-                                showAddEventModal(info.start, info.end);
-                            }
-                        });
-
-                        calendar.render();
                     }
+                });
 
+                // Autres initialisations et écouteurs d'événements
+                // ...
 
-                    // Ajoutez le gestionnaire d'événements pour l'événement shown.bs.modal
-                    $('#viewEventModal').on('shown.bs.modal', function () {
-                        // Ajoutez le gestionnaire d'événements pour le bouton "Modifier"
-                        document.getElementById('openEditModal').addEventListener('click', function () {
-                            // Fermez la fenêtre modale de visualisation
-                            $('#viewEventModal').modal('hide');
+                function initCalendar() {
+                    var calendarEl = document.getElementById('calendar');
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        locale: 'fr',
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        buttonText: {
+                            today: 'Aujourd\'hui',
+                            month: 'Mois',
+                            week: 'Semaine',
+                            day: 'Jour'
+                        },
+                        slotMinTime: '07:00:00',
+                        slotMaxTime: '18:00:00',
+                        slotDuration: '00:30:00',
+                        expandRows: true,
+                        stickyHeaderDates: true,
+                        allDaySlot: false,
+                        nowIndicator: true,
+                        events: 'get-events.php',
+                        eventClick: function (info) {
+                            var event = info.event;
+                            showEventModal('view', event);
+                        },
 
-                            // Ouvrez la fenêtre modale de modification
-                            $('#editEventModal').modal('show');
-                        });
+                        // Autres options et callbacks
+                        // ...
                     });
 
-
-                    function showEventModal(mode, event) {
-                        let eventId = event.id;
-
-                        $('#service_id').val(event.extendedProps.service).prop('disabled', true);
-                        $('#vehicule_id').val(event.extendedProps.vehicule).prop('disabled', true);
-
-                        // Formatez les dates en utilisant moment.js avec le support des locales
-                        moment.locale('fr'); // Définissez la locale sur français
-                        let formattedStartDate = moment(event.start.toISOString()).format('DD/MM/YYYY HH:mm');
-                        let formattedEndDate = moment(event.end.toISOString()).format('DD/MM/YYYY HH:mm');
-
-                        // Ajoutez cette ligne pour définir la valeur de 'view_reservation_id'
-                        $('#view_reservation_id').text(event.extendedProps.reservation_id);
-
-                        $('#view_service_id').val(event.extendedProps.service);
-                        $('#view_vehicule_id').val(event.extendedProps.vehicule);
-                        $('#view_date_debut').val(formattedStartDate);
-                        $('#view_date_fin').val(formattedEndDate);
-
-                        $('#viewEventModal').modal('show');
-                    }
+                    calendar.render();
+                }
 
 
-                    $('#addEventModal').on('show.bs.modal', function () {
-                        $('#add_service_id').val(''); // Remplacez par l'ID de l'élément de votre champ utilisateur
-                        $('#add_vehicule_id').val(''); // Remplacez par l'ID de l'élément de votre champ véhicule
-                        $('#add_date_debut').val(''); // Remplacez par l'ID de l'élément de votre champ date de début
-                        $('#add_date_fin').val(''); // Remplacez par l'ID de l'élément de votre champ date de fin
-                    });
+                function showEventModal(mode, event) {
+                    let eventId = event.id;
+                    $('#view_reservation_id').text(event.id);
+
+                    $('#service_id').val(event.extendedProps.service).prop('disabled', true);
+                    $('#vehicule_id').val(event.extendedProps.vehicule).prop('disabled', true);
+
+                    // Formatez les dates en utilisant moment.js avec le support des locales
+                    moment.locale('fr'); // Définissez la locale sur français
+                    let formattedStartDate = moment(event.start.toISOString()).format('DD/MM/YYYY HH:mm');
+                    let formattedEndDate = moment(event.end.toISOString()).format('DD/MM/YYYY HH:mm');
+
+                    // Ajoutez cette ligne pour définir la valeur de 'view_reservation_id'
+                    $('#view_reservation_id').text(event.extendedProps.reservation_id);
+
+                    $('#view_service_id').val(event.extendedProps.service);
+                    $('#view_vehicule_id').val(event.extendedProps.vehicule);
+                    $('#view_date_debut').val(formattedStartDate);
+                    $('#view_date_fin').val(formattedEndDate);
+
+                    $('#viewEventModal').modal('show');
+                }
 
 
-                    function showAddEventModal(startDate, endDate) {
-                        $('#add_date_debut').val('');
-                        $('#add_date_fin').val('');
-
-                        $('#addEventModal').modal('show');
-                    }
-
-                    $(document).on('click', '#editEventButton', function () {
-                        // Transférer les données de la fenêtre modale de visualisation vers la fenêtre modale d'édition/modification
-                        document.getElementById('edit_reservation_id').value = document.getElementById('view_reservation_id').innerText;
-                        document.getElementById('edit_service_id').value = document.getElementById('view_service_id').innerText;
-                        document.getElementById('edit_vehicule_id').value = document.getElementById('view_vehicule_id').innerText;
-                        document.getElementById('edit_date_debut').value = document.getElementById('view_date_debut').innerText;
-                        document.getElementById('edit_date_fin').value = document.getElementById('view_date_fin').innerText;
-
-                        // Ouvrir la fenêtre modale d'édition/modification
-                        $('#viewEventModal').modal('hide');
-                        $('#editEventModal').modal('show');
-
-
-                        // Effectuer une requête AJAX pour envoyer les données au fichier update-event.php
-                        document.getElementById('editEventForm').addEventListener('submit', function (event) {
-                            event.preventDefault();
-
-                            // Récupérer les données du formulaire d'édition
-                            const reservationId = document.getElementById('edit_reservation_id').value;
-                            const serviceId = document.getElementById('edit_service_id').value;
-                            const vehiculeId = document.getElementById('edit_vehicule_id').value;
-                            const dateDebut = document.getElementById('edit_date_debut').value;
-                            const dateFin = document.getElementById('edit_date_fin').value;
-
-                            // Effectuer une requête AJAX pour envoyer les données au fichier update-event.php
-                            const xhr = new XMLHttpRequest();
-                            xhr.open('POST', 'update-event.php', true);
-                            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                            xhr.onload = function () {
-                                if (xhr.status === 200) {
-                                    // Fermer la fenêtre modale d'édition/modification
-                                    $('#editEventModal').modal('hide');
-
-                                    // Actualiser le calendrier pour afficher les modifications
-                                    calendar.refetchEvents();
-                                } else {
-                                    console.error('Erreur lors de la mise à jour de la réservation : ' + xhr.statusText);
-                                }
-                            };
-                            xhr.send('reservation_id=' + encodeURIComponent(reservationId) + '&service_id=' + encodeURIComponent(serviceId) + '&vehicule_id=' + encodeURIComponent(vehiculeId) + '&date_debut=' + encodeURIComponent(dateDebut) + '&date_fin=' + encodeURIComponent(dateFin));
-                        });
-                    });
-
-
-                </script>
+            </script>
 </body>
 
 </html>
