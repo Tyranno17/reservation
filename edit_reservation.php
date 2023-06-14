@@ -40,21 +40,6 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $reservation = $result->fetch_assoc();
 
-    // Afficher les valeurs de $currentUserId et $reservation['utilisateur_id']
-    // echo "Current User ID: ";
-    // var_dump($currentUserId);
-    // echo "Reservation Creator ID: ";
-    // var_dump($reservation['utilisateur_id']);
-
-    // Vérifier si l'utilisateur actuellement connecté est le créateur de la réservation
-
-    // if ($currentUserId !== $reservation['utilisateur_id']) {
-    //     // L'utilisateur actuellement connecté n'est pas le créateur de la réservation
-    //     echo "Vous ne pouvez pas modifier cette réservation car vous n'êtes pas le créateur.";
-    //     exit; // Arrête l'exécution du script
-    // }
-
-
     $service_actuel_id = $reservation['service_id'];
     $vehicule_actuel_id = $reservation['vehicule_id'];
     $date_debut = new DateTime($reservation['date_debut']);
