@@ -34,6 +34,9 @@
                             <a class="nav-link" href="calendrier.php">Calendrier</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="reservations.php">Mes réservations</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="logout.php">Deconnexion</a>
                         </li>
                     </ul>
